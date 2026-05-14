@@ -41,8 +41,11 @@ export default function Login() {
     setError(''); setLoading(true)
     try {
       const { data } = await api.post('/auth/login/phone', { phone })
-      setIdentifier(data.identifier || phone); setOtpMethod('sms')
-      setOtpHint(`+91${phone}`); setDevOtp(data.devOtp || ''); setStep('otp')
+      setIdentifier(data.identifier || phone)
+      setOtpMethod('sms')
+      setOtpHint(`+91${phone}`)
+      setDevOtp('')
+      setStep('otp')
     } catch (err) { setError(err.response?.data?.message || 'Failed to send OTP') }
     finally { setLoading(false) }
   }
