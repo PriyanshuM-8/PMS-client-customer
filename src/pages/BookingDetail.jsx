@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import api from "../utils/api";
-import socket from "../utils/socket";
+import { getSocket } from "../utils/socket";
 import BottomNav from "../components/BottomNav";
 import Swal from "sweetalert2";
 import {
@@ -17,35 +17,21 @@ import {
   FaMotorcycle,
   FaTools,
   FaStar,
+  FaMoneyBillWave,
 } from "react-icons/fa";
 import { MdLocalGasStation, MdOutlineTimer, MdBuild } from "react-icons/md";
 import { HiLightningBolt } from "react-icons/hi";
 import { IoMdSync } from "react-icons/io";
 
-const STEPS = ["pending", "accepted", "assigned", "in_progress", "completed"];
+const STEPS = ["pending", "accepted", "assigned", "in_progress", "reached", "completed"];
 
 const stepConfig = {
-  pending: {
-    label: "Pending",
-    Icon: FaClock,
-    desc: "Waiting for pump to accept",
-  },
-  accepted: {
-    label: "Accepted",
-    Icon: FaCheckCircle,
-    desc: "Pump accepted your booking",
-  },
-  assigned: { label: "Assigned", Icon: FaWrench, desc: "Mechanic assigned" },
-  in_progress: {
-    label: "On the Way",
-    Icon: FaMotorcycle,
-    desc: "Service is on the way",
-  },
-  completed: {
-    label: "Completed",
-    Icon: FaCheckCircle,
-    desc: "Service completed",
-  },
+  pending:     { label: "Pending",      Icon: FaClock,        desc: "Waiting for pump to accept" },
+  accepted:    { label: "Accepted",      Icon: FaCheckCircle,  desc: "Pump accepted your booking" },
+  assigned:    { label: "Assigned",      Icon: FaWrench,       desc: "Service agent assigned" },
+  in_progress: { label: "On the Way",   Icon: FaMotorcycle,   desc: "Agent is on the way to you" },
+  reached:     { label: "Arrived",       Icon: FaMapMarkerAlt, desc: "Agent arrived at your location" },
+  completed:   { label: "Completed",     Icon: FaCheckCircle,  desc: "Service completed" },
 };
 
 export default function BookingDetail() {
@@ -59,6 +45,7 @@ export default function BookingDetail() {
   const [feedback, setFeedback] = useState("");
   const [ratingSubmitted, setRatingSubmitted] = useState(false);
   const [ratingLoading, setRatingLoading] = useState(false);
+  const [paymentLoading, setPaymentLoading] = useState(false);
 
   const fetchBooking = () => {
     api
@@ -69,18 +56,23 @@ export default function BookingDetail() {
 
   useEffect(() => {
     fetchBooking();
-    const onStatus = (status) => {
-      setBooking((prev) => (prev ? { ...prev, status } : prev));
-      fetchBooking();
+
+    const s = getSocket();
+    if (!s) return;
+
+    const onUpdate = (data) => {
+      if (data.bookingId?.toString() === id) {
+        // Full refetch karo taaki latest data mile
+        fetchBooking();
+      }
     };
-    socket.on(`booking:${id}:status`, onStatus);
-    socket.on("booking:update", (data) => {
-      if (data.bookingId?.toString() === id)
-        setBooking((prev) => (prev ? { ...prev, ...data } : prev));
-    });
+
+    s.on("booking:update", onUpdate);
+    s.on(`booking:${id}:status`, onUpdate);
+
     return () => {
-      socket.off(`booking:${id}:status`, onStatus);
-      socket.off("booking:update");
+      s.off("booking:update", onUpdate);
+      s.off(`booking:${id}:status`, onUpdate);
     };
   }, [id]);
 
@@ -129,6 +121,18 @@ export default function BookingDetail() {
       setError(err.response?.data?.message || "Rating failed");
     } finally {
       setRatingLoading(false);
+    }
+  };
+
+  const handleConfirmPayment = async () => {
+    setPaymentLoading(true);
+    try {
+      const { data } = await api.patch(`/bookings/my/${id}/confirm-payment`);
+      setBooking(data.data);
+    } catch (err) {
+      setError(err.response?.data?.message || "Payment confirmation failed");
+    } finally {
+      setPaymentLoading(false);
     }
   };
 
@@ -449,20 +453,110 @@ export default function BookingDetail() {
             </div>
           )}
 
-        {/* Completion OTP */}
-        {booking.completionOTP && booking.status === "in_progress" && (
+        {/* Mechanic Arrived — Work in progress */}
+        {booking.status === "reached" && booking.serviceType === "mechanic" && (
+          <div className="bg-white rounded-2xl border border-purple-200 shadow-sm p-4">
+            <div className="flex items-center gap-2 mb-2">
+              <div className="w-9 h-9 rounded-full bg-purple-100 flex items-center justify-center">
+                <FaWrench className="text-purple-600 text-base" />
+              </div>
+              <div>
+                <p className="text-gray-900 font-black text-xs">Mechanic Arrived!</p>
+                <p className="text-gray-400 text-[10px]">Work is in progress at your location</p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Mechanic completed job — show amount */}
+        {booking.status === "completed" && booking.serviceType === "mechanic" && booking.amount > 0 && (
+          <div className="bg-white rounded-2xl border border-green-200 shadow-sm p-4">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="w-9 h-9 rounded-full bg-green-100 flex items-center justify-center">
+                <FaCheckCircle className="text-green-600 text-base" />
+              </div>
+              <div>
+                <p className="text-gray-900 font-black text-xs">Work Completed!</p>
+                <p className="text-gray-400 text-[10px]">Payment collected by mechanic</p>
+              </div>
+            </div>
+            <div className="bg-gray-50 rounded-xl p-3 space-y-1.5">
+              {booking.workDetails?.description && (
+                <div className="flex justify-between text-xs">
+                  <span className="text-gray-500">Work Done</span>
+                  <span className="font-semibold text-gray-700 text-right max-w-[160px]">{booking.workDetails.description}</span>
+                </div>
+              )}
+              {(booking.workDetails?.partsChanged || []).map((p, i) => (
+                <div key={i} className="flex justify-between text-xs">
+                  <span className="text-gray-500">{p.partName}</span>
+                  <span className="font-semibold text-gray-700">₹{p.price}</span>
+                </div>
+              ))}
+              {booking.workDetails?.labourCharge > 0 && (
+                <div className="flex justify-between text-xs">
+                  <span className="text-gray-500">Labour</span>
+                  <span className="font-semibold text-gray-700">₹{booking.workDetails.labourCharge}</span>
+                </div>
+              )}
+              <div className="flex justify-between pt-2 border-t border-gray-200">
+                <span className="text-gray-900 font-black text-sm">Total Paid</span>
+                <span className="text-green-600 font-black text-xl">₹{booking.amount}</span>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Delivery Boy Arrived — Payment Screen */}
+        {booking.status === "reached" && booking.serviceType === "fuel" && (
+          <div className="bg-white rounded-2xl border border-green-200 shadow-sm p-4">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="w-9 h-9 rounded-full bg-green-100 flex items-center justify-center">
+                <FaMotorcycle className="text-green-600 text-base" />
+              </div>
+              <div>
+                <p className="text-gray-900 font-black text-xs">Delivery Boy Arrived!</p>
+                <p className="text-gray-400 text-[10px]">Please complete payment to receive fuel</p>
+              </div>
+            </div>
+            <div className="bg-gray-50 rounded-xl p-3 mb-3">
+              <div className="flex justify-between items-center">
+                <p className="text-gray-500 text-xs">Total Amount</p>
+                <p className="text-red-500 font-black text-xl">₹{booking.amount}</p>
+              </div>
+              {booking.priceBreakdown && (
+                <div className="mt-2 space-y-1">
+                  <div className="flex justify-between text-[10px] text-gray-400">
+                    <span>Fuel Cost</span><span>₹{booking.priceBreakdown.fuelCost}</span>
+                  </div>
+                  <div className="flex justify-between text-[10px] text-gray-400">
+                    <span>Delivery Fee</span><span>₹{booking.priceBreakdown.deliveryFee}</span>
+                  </div>
+                </div>
+              )}
+            </div>
+            <button onClick={handleConfirmPayment} disabled={paymentLoading}
+              className="w-full py-3 rounded-xl bg-gradient-to-r from-green-500 to-emerald-400 text-white font-bold text-xs shadow-md shadow-green-200/60 flex items-center justify-center gap-2 disabled:opacity-60">
+              {paymentLoading
+                ? <><IoMdSync className="animate-spin text-base" /> Processing...</>
+                : <><FaMoneyBillWave className="text-sm" /> Pay ₹{booking.amount} & Confirm Delivery</>}
+            </button>
+          </div>
+        )}
+
+        {/* Payment Confirmed — Fuel delivery in progress */}
+        {booking.status === "payment_pending" && (
           <div className="p-4 rounded-2xl bg-gradient-to-br from-green-500 to-emerald-400 shadow-md shadow-green-200/60 text-center">
             <div className="flex items-center justify-center gap-1.5 mb-2">
               <HiLightningBolt className="text-white text-sm" />
-              <p className="text-white/70 text-[9px] uppercase tracking-widest">
-                Share with Mechanic
-              </p>
+              <p className="text-white/70 text-[9px] uppercase tracking-widest">Payment Confirmed</p>
             </div>
-            <p className="text-3xl font-black tracking-[0.4em] text-white">
-              {booking.completionOTP}
-            </p>
+            <p className="text-white font-black text-base">Fuel delivery in progress...</p>
+            <p className="text-white/60 text-[10px] mt-2">Your fuel will be delivered shortly.</p>
           </div>
         )}
+
+
 
         {error && <p className="text-red-500 text-xs text-center">{error}</p>}
 

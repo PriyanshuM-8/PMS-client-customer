@@ -5,7 +5,7 @@ import { getSocket } from '../utils/socket'
 import BottomNav from '../components/BottomNav'
 import {
   FaGasPump, FaWrench, FaChevronLeft, FaMapMarkerAlt,
-  FaReceipt, FaTruck, FaMobileAlt, FaSatelliteDish
+  FaReceipt, FaTruck, FaSatelliteDish
 } from 'react-icons/fa'
 import { MdMyLocation, MdGpsFixed, MdGpsNotFixed } from 'react-icons/md'
 import { IoMdSync } from 'react-icons/io'
@@ -17,7 +17,7 @@ export default function CreateBooking() {
   const navigate = useNavigate()
 
   const [form, setForm] = useState({
-    addressFull: '', lat: '', lng: '', fuelType: 'petrol', quantity: '', description: ''
+    addressFull: '', lat: '', lng: '', fuelType: 'petrol', quantity: '', description: '', vehicleName: ''
   })
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
@@ -110,15 +110,8 @@ export default function CreateBooking() {
   setError('')
 
   const socket = getSocket()
-
-  if (!socket.connected) {
-    socket.connect()
-  }
-
-  socket.emit('send-location', {
-    latitude: lat,
-    longitude: lng,
-  })
+  if (socket && !socket.connected) socket.connect()
+  if (socket) socket.emit('send-location', { latitude: lat, longitude: lng })
 
   reverseGeocode(lat, lng)
 }
@@ -203,7 +196,7 @@ export default function CreateBooking() {
         lat: parseFloat(form.lat),
         lng: parseFloat(form.lng),
         ...(type === 'fuel' && { fuelType: form.fuelType, quantity: parseFloat(form.quantity) }),
-        ...(type === 'mechanic' && { workDetails: { description: form.description } }),
+        ...(type === 'mechanic' && { workDetails: { description: form.description, vehicleName: form.vehicleName } }),
       }
       const { data } = await api.post('/bookings', payload)
       navigate(`/bookings/${data.data._id}`)
@@ -332,9 +325,13 @@ export default function CreateBooking() {
             )}
 
             {!isFuel && (
-              <textarea name="description" placeholder="Describe the issue (e.g. flat tyre, engine problem...)"
-                value={form.description} onChange={handleChange} required rows={4}
-                className={`${inputCls} resize-none`} />
+              <>
+                <input name="vehicleName" placeholder="Vehicle name (e.g. Honda Activa, Maruti Swift)"
+                  value={form.vehicleName} onChange={handleChange} required className={inputCls} />
+                <textarea name="description" placeholder="Describe the issue (e.g. flat tyre, engine problem...)"
+                  value={form.description} onChange={handleChange} required rows={3}
+                  className={`${inputCls} resize-none`} />
+              </>
             )}
 
             {error && (
@@ -398,19 +395,6 @@ export default function CreateBooking() {
                     </div>
                   </div>
                   <p className="text-gray-800 font-bold text-sm">₹{breakdown.deliveryFee}</p>
-                </div>
-
-                <div className="flex items-center justify-between py-2.5 border-b border-gray-50">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-7 h-7 bg-purple-50 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <FaMobileAlt className="text-purple-400 text-[10px]" />
-                    </div>
-                    <div>
-                      <p className="text-gray-700 text-xs font-semibold">Platform Fee</p>
-                      <p className="text-gray-400 text-[10px]">Service & maintenance</p>
-                    </div>
-                  </div>
-                  <p className="text-gray-800 font-bold text-sm">₹{breakdown.platformFee}</p>
                 </div>
 
                 <div className="flex items-center justify-between pt-3 pb-1">

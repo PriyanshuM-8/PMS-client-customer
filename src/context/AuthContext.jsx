@@ -10,9 +10,9 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(() => localStorage.getItem('token'))
 
   useEffect(() => {
-    if (user?.id) connectSocket(user.id)
+    if (user?.id) connectSocket(user.id, () => {})
     return () => disconnectSocket()
-  }, [user])
+  }, [user?.id])
 
   const login = (tok, usr) => {
     localStorage.setItem('token', tok)
