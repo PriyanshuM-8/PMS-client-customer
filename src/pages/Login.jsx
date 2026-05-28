@@ -56,7 +56,7 @@ export default function Login() {
     if (otp.length !== 6) return setError('Enter 6-digit OTP')
     setError(''); setLoading(true)
     try {
-      const { data } = await api.post('/auth/verify-otp', { identifier, otp, method: otpMethod })
+      const { data } = await api.post('/auth/verify-otp', { identifier, otp, method: otpMethod, requestedRole: 'customer' })
       login(data.token, data.user); navigate('/dashboard')
     } catch (err) { setError(err.response?.data?.message || 'Invalid OTP') }
     finally { setLoading(false) }
