@@ -225,7 +225,7 @@ export default function Login() {
                 <div className="bg-yellow-50 border border-yellow-200 rounded-2xl px-4 py-3 mb-4">
                   <div className="flex items-center gap-2 mb-1">
                     <MdWarning className="text-yellow-500 text-base" />
-                    <p className="text-yellow-700 text-xs font-bold">Twilio Trial — SMS not delivered</p>
+                    <p className="text-yellow-700 text-xs font-bold">Test OTP</p>
                   </div>
                   <p className="text-yellow-900 text-lg font-black mt-2 tracking-[0.3em]">{devOtp}</p>
                 </div>
@@ -260,9 +260,8 @@ export default function Login() {
                 <div className="bg-yellow-50 border border-yellow-200 rounded-2xl px-4 py-3 mb-4">
                   <div className="flex items-center gap-2 mb-1">
                     <MdWarning className="text-yellow-500 text-base" />
-                    <p className="text-yellow-700 text-xs font-bold">Twilio Trial — SMS not delivered</p>
+                    <p className="text-yellow-700 text-xs font-bold">Test OTP</p>
                   </div>
-                  <p className="text-yellow-600 text-xs">Verify your number at twilio.com/console to receive SMS</p>
                   <p className="text-yellow-900 text-lg font-black mt-2 tracking-[0.3em]">{devOtp}</p>
                 </div>
               ) : (
