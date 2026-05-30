@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import api from '../utils/api'
 import { useAuth } from '../context/AuthContext'
 import BottomNav from '../components/BottomNav'
-import logo from '/Image/Logo1.png'
+import logo from '/Image/Logo.png'
 import {
   FaGasPump, FaWrench, FaWallet, FaCar, FaClipboardList,
   FaMapMarkerAlt, FaChevronRight, FaFire

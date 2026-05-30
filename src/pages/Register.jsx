@@ -52,7 +52,7 @@ export default function Register() {
     <div className="min-h-screen bg-white flex flex-col">
       <div className="p-6 pb-16 rounded-b-[3rem] bg-gradient-to-tr from-red-600 to-amber-500 shadow-2xl shadow-red-200">
         <div className="mt-8 text-center">
-          <img src="/Image/Logo1.png" alt="FuelX" className="w-20 h-20 object-contain mx-auto drop-shadow-xl" />
+          <img src="/Image/Logo.png" alt="FuelX" className="w-20 h-20 object-contain mx-auto drop-shadow-xl" />
           <p className="text-white/70 text-sm mt-2">Create your account</p>
         </div>
       </div>

@@ -258,7 +258,7 @@ export default function Profile() {
         },
         {
           icon: <i className="ri-information-line" />,
-          label: "About PM PetroCareX",
+          label: "About PM CareX",
           action: () => setActiveSheet("about"),
         },
       ],
@@ -426,7 +426,7 @@ export default function Profile() {
         </div>
 
         <p className="text-center text-gray-300 text-[10px] pb-2">
-          PM PetroCareX v1.0.0 · Made in India
+          PM CareX v1.0.0 · Made in India
         </p>
       </div>
 
@@ -863,7 +863,7 @@ export default function Profile() {
                 </p>
 
                 <p>
-                  PM PetroCareX is committed to protecting your personal
+                  PM CareX is committed to protecting your personal
                   information and maintaining your trust while using our fuel
                   delivery and roadside assistance services.
                 </p>
@@ -882,7 +882,7 @@ export default function Profile() {
                 </SectionBlock>
 
                 <SectionBlock title="Communication Privacy">
-                  To protect customer privacy, PM PetroCareX may use masked
+                  To protect customer privacy, PM CareX may use masked
                   communication services for calls and messages between
                   customers, mechanics, and petrol pumps.
                 </SectionBlock>
@@ -895,7 +895,7 @@ export default function Profile() {
 
                 <SectionBlock title="Payments">
                   Payment information is processed securely through supported
-                  payment providers. PM PetroCareX does not store your card or
+                  payment providers. PM CareX does not store your card or
                   banking details directly.
                 </SectionBlock>
 
@@ -920,7 +920,7 @@ export default function Profile() {
             <SheetContent title="Terms of Service">
               <div className="space-y-3 text-xs text-gray-500 leading-relaxed">
                 <SectionBlock title="Service Usage">
-                  PM PetroCareX provides on-demand fuel delivery and roadside
+                  PM CareX provides on-demand fuel delivery and roadside
                   mechanic assistance services. Users must provide accurate
                   vehicle details, booking information, and live location for
                   successful service delivery.
@@ -950,13 +950,13 @@ export default function Profile() {
                 </SectionBlock>
 
                 <SectionBlock title="Liability">
-                  PM PetroCareX acts as a service facilitation platform
+                  PM CareX acts as a service facilitation platform
                   connecting customers, petrol pumps, and mechanics. Liability
                   is limited to the amount paid for the specific booking.
                 </SectionBlock>
 
                 <SectionBlock title="Account Suspension">
-                  PM PetroCareX reserves the right to suspend or terminate
+                  PM CareX reserves the right to suspend or terminate
                   accounts involved in suspicious activity, payment fraud,
                   abuse, or policy violations.
                 </SectionBlock>
@@ -970,11 +970,11 @@ export default function Profile() {
 
           {/* ── About ── */}
           {activeSheet === "about" && (
-            <SheetContent title="About PM PetroCareX">
+            <SheetContent title="About PM CareX">
               <div className="text-center py-2">
                 <img
-                  src="/Image/Logo1.png"
-                  alt="PM PetroCareX"
+                  src="/Image/Logo.png"
+                  alt="PM CareX"
                   className="w-20 h-20 object-contain mx-auto drop-shadow-lg"
                 />
                 <p className="text-gray-400 text-xs mt-2">Version 1.0.0</p>
@@ -982,7 +982,7 @@ export default function Profile() {
 
               <div className="space-y-3 mt-4 text-xs text-gray-500 leading-relaxed">
                 <p>
-                  PM PetroCareX is an on-demand roadside assistance platform
+                  PM CareX is an on-demand roadside assistance platform
                   designed to provide emergency fuel delivery and mechanic
                   support directly to your live location.
                 </p>
@@ -1019,7 +1019,7 @@ export default function Profile() {
                 </SectionBlock>
 
                 <p className="text-center text-[10px] text-gray-300 pt-2">
-                  © 2026 PM PetroCareX. All rights reserved.
+                  © 2026 PM CareX. All rights reserved.
                 </p>
               </div>
             </SheetContent>
@@ -1052,7 +1052,7 @@ export default function Profile() {
                   },
                   {
                     q: "Is my phone number safe?",
-                    a: "Yes. PM PetroCareX uses secure masked communication so your personal mobile number is not directly shared.",
+                    a: "Yes. PM CareX uses secure masked communication so your personal mobile number is not directly shared.",
                   },
                   {
                     q: "What payment methods are available?",
