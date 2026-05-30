@@ -33,7 +33,7 @@ export default function Login() {
     try {
       const { data } = await api.post('/auth/login/email', { email, password })
       if (data.otpMethod === 'none') { login(data.token, data.user); navigate('/dashboard'); return }
-      setIdentifier(email); setOtpMethod('email'); setOtpHint(email); setStep('otp')
+      setIdentifier(email); setOtpMethod('email'); setOtpHint(email); setDevOtp(data.devOtp || ''); setStep('otp')
     } catch (err) { setError(err.response?.data?.message || 'Login failed') }
     finally { setLoading(false) }
   }
@@ -69,9 +69,7 @@ export default function Login() {
     try {
       const payload = loginMethod === 'email' ? { email } : { phone }
       const { data } = await api.post('/auth/forgot-password', payload)
-      if (loginMethod === 'phone') {
-        setDevOtp(data.devOtp || '')
-      }
+      setDevOtp(data.devOtp || '')
       setStep('reset_password')
     } catch (err) { setError(err.response?.data?.message || 'Failed to send reset link') }
     finally { setLoading(false) }
