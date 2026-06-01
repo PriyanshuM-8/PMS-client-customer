@@ -160,7 +160,7 @@ export default function BookingDetail() {
 
   const currentStep = STEPS.indexOf(booking.status);
   const isCancelled = booking.status === "cancelled";
-  const canCancel = ["pending", "accepted"].includes(booking.status);
+  const canCancel = !["completed", "cancelled"].includes(booking.status);
   const showCallBtn =
     ["assigned", "in_progress"].includes(booking.status) && booking.mechanic;
 

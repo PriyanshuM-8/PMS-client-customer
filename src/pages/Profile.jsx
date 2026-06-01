@@ -927,9 +927,7 @@ export default function Profile() {
                 </SectionBlock>
 
                 <SectionBlock title="Bookings & Cancellations">
-                  Customers may cancel bookings before fuel dispatch or mechanic
-                  assignment. Once service has started or a mechanic is
-                  assigned, cancellation may not be available.
+                  Customers may cancel bookings at any time before they are completed. Once service has been completed, cancellation is not available.
                 </SectionBlock>
 
                 <SectionBlock title="Payments">
@@ -1040,7 +1038,7 @@ export default function Profile() {
                   },
                   {
                     q: "Can I cancel my booking?",
-                    a: "Yes, bookings can be cancelled before fuel dispatch or mechanic assignment. Once service starts, cancellation is not available.",
+                    a: "Yes, bookings can be cancelled at any time before they are completed. However, you cannot cancel once the service has been completed.",
                   },
                   {
                     q: "How can I track my booking?",
